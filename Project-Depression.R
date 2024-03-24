@@ -86,7 +86,6 @@ ggplot(merged_data, aes(x = avg_income, y = avg_depression, color = region)) +
   theme_minimal()
 
 # Ordinale Regressionsanalyse
-# Laden der erforderlichen Bibliotheken
 install.packages("ordinal")
 library(ordinal)
 
