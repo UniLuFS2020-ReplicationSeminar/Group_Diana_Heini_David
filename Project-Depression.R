@@ -11,6 +11,7 @@ View(subset_data)
 
 # Cleaning Data Filter out rows with missing values in any column
 cleaned_data <- subset_data[complete.cases(subset_data), ]
+View(cleaned_data)
 
 # Average Depression per Land
 depression_by_country <- cleaned_data %>%
@@ -60,12 +61,6 @@ ggplot(hincome_by_age, aes(x = age_group, y = avg_hincome)) +
   labs(x = "Age Group", y = "Average Household Income", title = "Average Household Income by Age Group") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-
-
-
-
-
-
 # Daten für Tschechien filtern
 czech_data <- cleaned_data %>%
   filter(cntry == "CZ")
@@ -89,3 +84,23 @@ ggplot(merged_data, aes(x = avg_income, y = avg_depression, color = region)) +
   labs(x = "Haushaltseinkommen", y = "Durchschnittliche Depressionen", 
        title = "Vergleich von Einkommen und Depressionen nach Regionen in Tschechien") +
   theme_minimal()
+
+# Ordinale Regressionsanalyse
+# Laden der erforderlichen Bibliotheken
+install.packages("ordinal")
+library(ordinal)
+
+# Konvertieren der abhängigen Variable in einen Faktor
+cleaned_data$w4q47 <- factor(cleaned_data$w4q47)
+
+# Ordinale Regression durchführen
+ord_model <- clm(w4q47 ~ gndr + agea + eduyrs + hinctnta, data = cleaned_data)
+
+# Zusammenfassung des Modells anzeigen
+summary(ord_model)
+
+
+
+
+#Delete environment
+rm(list = ls())
