@@ -32,5 +32,25 @@ data_depression <- data_depression %>%
 
 View(data_depression)
 
+#renaming the labels on variables to more meaningful names
+
+data_depression$gender[data_depression$gender == "1"] <- "Male"
+data_depression$gender[data_depression$gender == "2"] <- "Female"
+data_depression$gender[data_depression$gender == "9"] <- "No answer"
+
+#checking for missing values in the dataset
+
+# Replace missing values marked with 9999 and 999 with NA
+data_depression[data_depression == 99999] <- NA
+data_depression[data_depression == 999] <- NA
+
+missing_values <- data_depression %>%
+  summarise_all(~sum(is.na(.)))
+
+# Print out the missing values
+print(missing_values)
+
+#country has 1 missing value, gender has 4
+
 
 
