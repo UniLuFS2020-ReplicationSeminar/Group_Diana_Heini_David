@@ -36,6 +36,7 @@ library(ggplot2)
 library(haven)
 library(dplyr)
 
+
 getwd()
 data <- read_sav("CRON2W4e01.sav")
 View(data)
@@ -55,9 +56,12 @@ View(data_depression)
 ```
 
 
+Now the dataset is set and we want to present our research question and hypthesis:
+The dataset was evaluated from the European Social survey. In the dataset we chose 6 important variables that we want to test: country, age, depression, household income and region. 
 
+Our hypothesis is that there is a strong correlation between these variables and the countrys. We think that there are smaller differences in the correlation between these variables in the north of Europe because theses states are more stable and show a higher rate of happiness. However we further think that the countrys in the south of Europe have a higher differences in the variables because they are very unstable, have a higher criminality rate and are poorer.
 
-
+This leads to our research question: Do the northern European countries really have very small or even no differences in the variables?
 
 
 
