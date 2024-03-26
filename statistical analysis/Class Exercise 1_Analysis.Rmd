@@ -36,6 +36,7 @@ Load packaged and read the Data
 library(ggplot2)
 library(haven)
 library(dplyr)
+library(magrittr)
 
 
 getwd()
@@ -62,19 +63,87 @@ The dataset was evaluated from the European Social survey. In the dataset we cho
 
 Our hypothesis is that there is a strong correlation between these variables and the countrys. We think that there are smaller differences in the correlation between these variables in the north of Europe because these states are more stable and show a higher rate of happiness. However we further think that the countrys in the south of Europe have a higher differences in the variables because they are very unstable, have a higher criminality rate and are poorer.
 
-This leads to our research question: Do the northern European countries really have very small or even no differences in the variables?
+This leads to our research question: Do the northern European countries really have very small or even no differences in the variables compared to the southern countrys?
 
 
+For the dataset we want to rename the columns into more meaningful names
+```{r}
+data_depression <- data_depression %>% 
+  rename(country = cntry) %>% 
+  rename(age = agea) %>% 
+  rename(gender = gndr) %>%
+  rename(depression = w4q47) %>%
+  rename(income = hinctnta)
+```
+
+Check the renamed columns
+```{r}
+View(data_depression)
+```
+
+Check the average depression per country
+```{r}
+depression_by_country <- data_depression %>%
+  group_by(country) %>%
+  summarise(avg_depression = mean(depression, na.rm = TRUE))
+```
+
+View the average of depression per country
+```{r}
+View(depression_by_country)
+```
+
+Let's create a bar chart for the average depression
+```{r}
+ggplot(depression_by_country, aes(x = reorder(country, -avg_depression), y = avg_depression)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(x = "Country", y = "Average depression", title = "Average depression by countrys") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+The first interpretation of this histogram is that we see a lower depression rate in the north of Europe. Finland, Sweden, Slovenia and Island cross just a bit the rate 1.5 for the depression. Czech Republic, Italy, France and Portugal showcase a much higher depression rate. A personal comment from us is also that we as Swiss people perceive that the southern countrys are very happy and open. This definitely does not correlate with the European Social Survey.
 
 
+Let's analyse the depression rate per gender
+```{r}
+depression_by_gender <- data_depression %>%
+  group_by(gender) %>%
+  summarise(avg_depression = mean(depression, na.rm = TRUE))
+```
+
+and check it
+```{r}
+View(depression_by_gender)
+```
+
+There are some missing values NA, so we should remove them and rename the 1 for male and 2 for female
+```{r}
+cleaned_depression_by_gender <- depression_by_gender %>%
+  na.omit() %>%
+  mutate(gender = ifelse(gender == 1, "male", gender)) %>%
+  mutate(gender = ifelse(gender == 2, "female", gender))
+```
+
+After we remove them we check it and we see a difference in the averages per gender
+```{r}
+View(cleaned_depression_by_gender)
+```
+
+Now we should again visualize it in a histogram
+```{r}
+ggplot(cleaned_depression_by_gender, aes(x = reorder(gender, -avg_depression), y = avg_depression)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(x = "Gender", y = "Average depression", title = "Average depression by gender") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+This histogram shows us the average depression by gender. There is not a significant answer but we see that females have a higher depression rate than men. 
 
 
-
-
-
-
-
-
+The next step is to analyse the means from depression by gender & country
+```{r}
+gender_by_country <- data_depression %>%
+  group_by(country, gender) %>%
+  summarise(mean_variable = mean(depression))
+```
 
 
 
