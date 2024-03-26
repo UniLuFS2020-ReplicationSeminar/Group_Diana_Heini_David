@@ -19,7 +19,18 @@ data_depression <- data %>% select(cntry, agea, gndr, w4q47, hinctnta, region)
 
 View(data_depression)
 
+#renaming the columns to more meaningful names
 
+data_depression <- data_depression %>% 
+  rename(country = cntry) %>% 
+  rename(age = agea) %>% 
+  rename(gender = gndr) %>%
+  rename(depression = w4q47) %>%
+  rename(income = hinctnta)
+
+#checking that the columns have been renamed
+
+View(data_depression)
 
 
 
