@@ -1,0 +1,73 @@
+---
+title: "Class Exercise 1"
+author: "Diana, Heini, David"
+date: "2024-03-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+Load packaged and read the Data
+```{r}
+library(ggplot2)
+library(haven)
+library(dplyr)
+
+getwd()
+data <- read_sav("CRON2W4e01.sav")
+View(data)
+```
+
+
+Filtering a subset of columns in the data needed for the analysis: country, age, gender, depression variable, household income, region
+```{r}
+data_depression <- data %>% select(cntry, agea, gndr, w4q47, hinctnta, region)
+
+```
+
+Checking that the new dataset contains the 6 variables
+
+```{r}
+View(data_depression)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
