@@ -30,7 +30,7 @@ plot(pressure)
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 
-Load packaged and read the Data
+#Load packaged and read the Data
 ```{r}
 library(ggplot2)
 library(haven)
@@ -43,25 +43,27 @@ View(data)
 ```
 
 
-Filtering a subset of columns in the data needed for the analysis: country, age, gender, depression variable, household income, region
+#Filtering a subset of columns in the data needed for the analysis: country, age, gender, depression variable, household income, region
 ```{r}
 data_depression <- data %>% select(cntry, agea, gndr, w4q47, hinctnta, region)
 
 ```
 
-Checking that the new dataset contains the 6 variables
+#Checking that the new dataset contains the 6 variables
 
 ```{r}
 View(data_depression)
 ```
 
 
-Now the dataset is set and we want to present our research question and hypthesis:
-The dataset was evaluated from the European Social survey. In the dataset we chose 6 important variables that we want to test: country, age, depression, household income and region. 
+#Now the dataset is set and we want to present our research question and hypthesis:
+#The dataset was evaluated from the European Social survey. In the dataset we chose 6 important variables #that we want to test: country, age, depression, household income and region. 
 
-Our hypothesis is that there is a strong correlation between these variables and the countrys. We think that there are smaller differences in the correlation between these variables in the north of Europe because theses states are more stable and show a higher rate of happiness. However we further think that the countrys in the south of Europe have a higher differences in the variables because they are very unstable, have a higher criminality rate and are poorer.
+#Our hypothesis is that there is a strong correlation between these variables and the countrys. We think that #there are smaller differences in the correlation between these variables in the north of Europe because #theses states are more stable and show a higher rate of happiness. However we further think that the #countrys in the south of Europe have a higher differences in the variables because they are very unstable, #have a higher criminality rate and are poorer.
 
-This leads to our research question: Do the northern European countries really have very small or even no differences in the variables?
+#This leads to our research question: Do the northern European countries really have very small or even no #differences in the variables?
+
+
 
 
 
