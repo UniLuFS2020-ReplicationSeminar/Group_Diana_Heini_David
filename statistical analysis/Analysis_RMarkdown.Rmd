@@ -1,0 +1,238 @@
+---
+title: "Class Exercise 1"
+author: "Diana, Heini, David"
+date: "2024-03-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+Load packaged and read the Data
+
+```{r}
+library(ggplot2)
+library(haven)
+library(dplyr)
+library(magrittr)
+
+
+getwd()
+data <- read_sav("CRON2W4e01.sav")
+View(data)
+```
+
+
+Filtering a subset of columns in the data needed for the analysis: country, age, gender, depression variable, household income, region.
+
+```{r}
+data_depression <- data %>% select(cntry, agea, gndr, w4q47, hinctnta, region)
+
+```
+
+Checking that the new dataset contains the 6 variables
+
+```{r}
+View(data_depression)
+```
+
+Now the dataset is set and we want to present our research question and hypothesis:
+The dataset was evaluated from the European Social survey. In the dataset we chose 6 important variables that we want to test: country, age, depression, household income and region. 
+
+Our hypothesis is that there is a strong correlation between these variables and the countrys. We think that there are smaller differences in the correlation between these variables in the north of Europe because these states are more stable and show a higher rate of happiness. However we further think that the countrys in the south of Europe have a higher differences in the variables because they are very unstable, have a higher criminality rate and are poorer.
+
+This leads to our research question: Do the northern European countries really have very small or even no differences in the variables compared to the southern countrys?
+
+
+For the dataset we want to rename the columns into more meaningful names
+```{r}
+data_depression <- data_depression %>% 
+  rename(country = cntry) %>% 
+  rename(age = agea) %>% 
+  rename(gender = gndr) %>%
+  rename(depression = w4q47) %>%
+  rename(income = hinctnta)
+```
+
+Check the renamed columns
+```{r}
+View(data_depression)
+```
+
+Check the average depression per country
+```{r}
+depression_by_country <- data_depression %>%
+  group_by(country) %>%
+  summarise(avg_depression = mean(depression, na.rm = TRUE))
+```
+
+View the average of depression per country
+```{r}
+View(depression_by_country)
+```
+
+Let's create a bar chart for the average depression
+```{r}
+ggplot(depression_by_country, aes(x = reorder(country, -avg_depression), y = avg_depression)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(x = "Country", y = "Average depression", title = "Average depression by countrys") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+The first interpretation of this histogram is that we see a lower depression rate in the north of Europe. Finland, Sweden, Slovenia and Island cross just a bit the rate 1.5 for the depression. Czech Republic, Italy, France and Portugal showcase a much higher depression rate. A personal comment from us is also that we as Swiss people perceive that the southern countrys are very happy and open. This definitely does not correlate with the European Social Survey.
+
+
+Let's analyse the depression rate per gender
+```{r}
+depression_by_gender <- data_depression %>%
+  group_by(gender) %>%
+  summarise(avg_depression = mean(depression, na.rm = TRUE))
+```
+
+and check it
+```{r}
+View(depression_by_gender)
+```
+
+There are some missing values NA, so we should remove them and rename the 1 for male and 2 for female
+```{r}
+cleaned_depression_by_gender <- depression_by_gender %>%
+  na.omit() %>%
+  mutate(gender = ifelse(gender == 1, "male", gender)) %>%
+  mutate(gender = ifelse(gender == 2, "female", gender))
+```
+
+
+
+After we remove them we check it and we see a difference in the averages per gender
+```{r}
+View(cleaned_depression_by_gender)
+```
+
+Now we should again visualize it in a histogram
+```{r}
+ggplot(cleaned_depression_by_gender, aes(x = reorder(gender, -avg_depression), y = avg_depression)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(x = "Gender", y = "Average depression", title = "Average depression by gender") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+This histogram shows us the average depression by gender. There is not a significant answer but we see that females have a higher depression rate than men. 
+
+
+Creating a new column so that is includes only the 2 genders
+```{r}
+data_depression$gender2 <- NA
+
+data_depression$gender2[data_depression$gender %in% c("Male", "Female")] <- data_depression$gender[data_depression$gender %in% c("Male", "Female")] 
+```
+
+Checking if it worked 
+```{r}
+View(data_depression)
+```
+
+
+
+The next step is to analyse the average depression per gender & country
+```{r}
+gender2_by_country <- data_depression %>%
+  group_by(country, gender2) %>%
+  summarise(mean_variable = mean(depression), .groups = 'drop') %>%
+  na.omit()
+```
+
+View it
+```{r}
+View(gender2_by_country)
+```
+
+Print the graph
+```{r}
+print(gender2_by_country)
+```
+
+We plot it now
+```{r}
+ggplot(gender2_by_country, aes(x = country, y = mean_variable, fill = gender2)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Mean Variable by Country and Gender",
+       x = "Country",
+       y = "Mean Variable") +
+  theme_minimal()
+```
+
+Looks like females have higher depression scores in all countries except Island and Italy
+Biggest differences seems to be in Austria, Belgium and Czech Republic
+
+
+To see now if our hypothesis is supported, we want to make an ANOVA Testing:
+Creating a new column that groups the nordic countries and other countries to 2 categories; North and South
+```{r}
+data_depression$area <- ifelse(data_depression$country %in% c("FI", "SE", "IS"), "North", "South")
+
+```
+
+checking how the depression scores look like in the 2 areas
+```{r}
+gender2_by_area <- data_depression %>%
+  group_by(area, gender2) %>%
+  summarise(mean_variable = mean(depression), .groups = 'drop') %>%
+  na.omit()
+```
+
+Plot it
+```{r}
+ggplot(gender2_by_area, aes(x = area, y = mean_variable, fill = gender2)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average depression in the two areas",
+       x = "Country",
+       y = "Mean depression") +
+  theme_minimal()
+
+```
+visually seems that there is a difference that matches with our hypothesis; differences are bigger in south category
+
+testing it with a ANOVA test
+```{r}
+model <- aov(depression ~ area + gender2 + area:gender2, data = data_depression)
+
+summary(model)
+
+```
+Area and gender are separately significant (p<.001), the interaction term slightly less (p=.05)
+
+post-hoc test to see where the differences are
+```{r}
+TukeyHSD(model)
+```
+
+All differences are significant (p<.001) except for the difference between North:Male-North:Female; hypothesis supported :)
+
+
+
+
+
+
+
+
