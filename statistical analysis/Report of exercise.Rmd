@@ -31,7 +31,7 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 
 
-In this RMarkdown file we will report shorty our process and the results. 
+In this RMarkdown file we will report shortly our process and the results. 
 
 For this Class exercise we chose a dataset from the European Social Survey. We perceived this dataset as very huge whith 6033 objects. On the website there is a map of all the european countrys presented. After discussing this map we slowly arrived to our research question. In this map we saw the northern countrys had a smaller depression rate than the southern. 
 On this point to be able to analyse and test a possible hypothesis we chose 6 important variables to test: country, age, depression, household income and region. 
