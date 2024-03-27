@@ -123,6 +123,8 @@ cleaned_depression_by_gender <- depression_by_gender %>%
   mutate(gender = ifelse(gender == 2, "female", gender))
 ```
 
+
+
 After we remove them we check it and we see a difference in the averages per gender
 ```{r}
 View(cleaned_depression_by_gender)
@@ -138,12 +140,97 @@ ggplot(cleaned_depression_by_gender, aes(x = reorder(gender, -avg_depression), y
 This histogram shows us the average depression by gender. There is not a significant answer but we see that females have a higher depression rate than men. 
 
 
-The next step is to analyse the means from depression by gender & country
+Creating a new column so that is includes only the 2 genders
 ```{r}
-gender_by_country <- data_depression %>%
-  group_by(country, gender) %>%
-  summarise(mean_variable = mean(depression))
+data_depression$gender2 <- NA
+
+data_depression$gender2[data_depression$gender %in% c("Male", "Female")] <- data_depression$gender[data_depression$gender %in% c("Male", "Female")] 
 ```
+
+Checking if it worked 
+```{r}
+View(data_depression)
+```
+
+
+
+The next step is to analyse the average depression per gender & country
+```{r}
+gender2_by_country <- data_depression %>%
+  group_by(country, gender2) %>%
+  summarise(mean_variable = mean(depression), .groups = 'drop') %>%
+  na.omit()
+```
+
+View it
+```{r}
+View(gender2_by_country)
+```
+
+Print the graph
+```{r}
+print(gender2_by_country)
+```
+
+We plot it now
+```{r}
+ggplot(gender2_by_country, aes(x = country, y = mean_variable, fill = gender2)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Mean Variable by Country and Gender",
+       x = "Country",
+       y = "Mean Variable") +
+  theme_minimal()
+```
+
+Looks like females have higher depression scores in all countries except Island and Italy
+Biggest differences seems to be in Austria, Belgium and Czech Republic
+
+
+To see now if our hypothesis is supported, we want to make an ANOVA Testing:
+Creating a new column that groups the nordic countries and other countries to 2 categories; North and South
+```{r}
+data_depression$area <- ifelse(data_depression$country %in% c("FI", "SE", "IS"), "North", "South")
+
+```
+
+checking how the depression scores look like in the 2 areas
+```{r}
+gender2_by_area <- data_depression %>%
+  group_by(area, gender2) %>%
+  summarise(mean_variable = mean(depression), .groups = 'drop') %>%
+  na.omit()
+```
+
+Plot it
+```{r}
+ggplot(gender2_by_area, aes(x = area, y = mean_variable, fill = gender2)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average depression in the two areas",
+       x = "Country",
+       y = "Mean depression") +
+  theme_minimal()
+
+```
+visually seems that there is a difference that matches with our hypothesis; differences are bigger in south category
+
+testing it with a ANOVA test
+```{r}
+model <- aov(depression ~ area + gender2 + area:gender2, data = data_depression)
+
+summary(model)
+
+```
+Area and gender are separately significant (p<.001), the interaction term slightly less (p=.05)
+
+post-hoc test to see where the differences are
+```{r}
+TukeyHSD(model)
+```
+
+All differences are significant (p<.001) except for the difference between North:Male-North:Female; hypothesis supported :)
+
+
+
 
 
 
