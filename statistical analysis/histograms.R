@@ -1,11 +1,11 @@
-# Average Depression per Land
+# Average Depression per country
 depression_by_country <- data_depression %>%
   group_by(country) %>%
   summarise(avg_depression = mean(depression, na.rm = TRUE))
 
 View(depression_by_country)
 
-# Bar Chart for average Depression
+# Bar Chart for average Depression by country
 ggplot(depression_by_country, aes(x = reorder(country, -avg_depression), y = avg_depression)) +
   geom_bar(stat = "identity", fill = "skyblue") +
   labs(x = "Land", y = "Durchschnittliche Depression", title = "Durchschnittliche Depression nach Ländern") +
@@ -14,7 +14,8 @@ ggplot(depression_by_country, aes(x = reorder(country, -avg_depression), y = avg
 # Average Depression per gender
 depression_by_gender <- data_depression %>%
   group_by(gender) %>%
-  summarise(avg_depression = mean(depression, na.rm = TRUE))
+  summarise(avg_depression = mean(depression, na.rm = TRUE)) %>%
+  na.omit()
 
 View(depression_by_gender)
 
@@ -25,32 +26,48 @@ ggplot(depression_by_gender, aes(x = reorder(gender, -avg_depression), y = avg_d
   labs(x = "gender", y = "Durchschnittliche Depression", title = "Durchschnittliche Depression nach Geschlecht") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-#Based on this there seems to be a difference in depression between the genders and countries
+#Based on this there seems to be a difference in depression between both genders and countries
 
-#Note; only 2 data points for gender = no answer -> should be left out from the analysis?
+#Note; only 2 data points for gender = "no answer" -> should be left out from the analysis?
 
-#Calculating means in depression per gender & country
+#creating a new column gender2 that includes only Female and Male values from the gender column
 
-gender_by_country <- data_depression %>%
-  group_by(country, gender) %>%
-  summarise(mean_variable = mean(depression))
+data_depression$gender2 <- NA
 
-print(gender_by_country)
+data_depression$gender2[data_depression$gender %in% c("Male", "Female")] <- data_depression$gender[data_depression$gender %in% c("Male", "Female")]
+
+#checking that it worked
+
+View(data_depression)
+
+#It did so we calculate the average depression per gender & country
+
+gender2_by_country <- data_depression %>%
+  group_by(country, gender2) %>%
+  summarise(mean_variable = mean(depression), .groups = 'drop') %>%
+  na.omit()
+
+print(gender2_by_country)
 
 #creating a data frame of the grouping
 
-result <- data.frame(gender_by_country)
+result <- data.frame(gender2_by_country)
 
 View(result)
 
 #creating a bar chart to visually compare the grouping
 
-ggplot(gender_by_country, aes(x = country, y = mean_variable, fill = gender)) +
+ggplot(gender2_by_country, aes(x = country, y = mean_variable, fill = gender2)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Mean Variable by Country and Gender",
+  labs(title = "Average depression in different countries",
        x = "Country",
-       y = "Mean Variable") +
+       y = "Mean depression") +
   theme_minimal()
 
 #looks like females have higher depression scores in all countries except Island and Italy
+#biggest differences seems to be in Austria, Belgium and Czech Republic
+
+
+
+
                             
