@@ -45,6 +45,11 @@ View(result)
 
 #creating a bar chart to visually compare the grouping
 
+library(haven)
+library(dplyr)
+library(magrittr)
+library(ggplot2)
+
 ggplot(gender_by_country, aes(x = country, y = mean_variable, fill = gender)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Mean Variable by Country and Gender",
