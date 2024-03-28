@@ -44,6 +44,3 @@ TukeyHSD(model)
 
 tukey_result <- TukeyHSD(model)
 
-tukey_result[3:3]
-
-write.csv(tukey_result[["area"]][["gender2"]][["area:gender2"]], file = "tukey_results.csv", row.names = TRUE, col.names = TRUE)
